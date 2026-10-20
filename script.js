@@ -3,6 +3,9 @@
 const init3D = () => {
     const container = document.getElementById('canvas-container');
 
+    // Detect mobile for performance optimizations
+    const isMobile = window.innerWidth <= 768;
+
     // Scene setup
     const scene = new THREE.Scene();
 
@@ -11,13 +14,14 @@ const init3D = () => {
     camera.position.z = 5;
 
     // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
     container.appendChild(renderer.domElement);
 
-    // Create a complex shape (Icosahedron)
-    const geometry = new THREE.IcosahedronGeometry(2, 20); // 20 detail level for smoothness
+    // Create a complex shape (Icosahedron) — lower detail on mobile
+    const detailLevel = isMobile ? 8 : 20;
+    const geometry = new THREE.IcosahedronGeometry(2, detailLevel);
 
     // Create Glass/Liquid Material
     const material = new THREE.MeshPhysicalMaterial({
